@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
+Transform: 'AWS::Serverless-2016-10-31'
 Description: >
   access-log-trigger
 
@@ -18,7 +18,6 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.8
       Role: 'arn:aws:iam::937333453566:role/CloudFormationServiceRole'
-      Environment:
         Variables:
           REGION: eu-west-1
       Events:
