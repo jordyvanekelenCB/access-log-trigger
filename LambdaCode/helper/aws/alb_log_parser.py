@@ -8,7 +8,7 @@ logger.setLevel(logging.INFO)
 
 class ALBLogParser:
 
-    def parse_alb_log_file(self, file):
+    def parse_alb_log_file(self, alb_log_file):
         fields = [
             "type",
             "timestamp",
@@ -47,16 +47,18 @@ class ALBLogParser:
         # Create list of objects
         alb_log_array = [];
 
-        for line in file.split('\n'):
-            matches = re.search(regex, line)
+        for log_line in alb_log_file.split('\n'):
 
-            if matches:
+            # Get the regex matches from log line
+            regex_matches = re.search(regex, log_line)
+
+            if regex_matches:
                 alb_log = ALBLog();
 
                 for i, field in enumerate(fields):
 
                     # Set the attribute of the log file object with the value found with the regex
-                    setattr(alb_log, field, matches.group(i+1))
+                    setattr(alb_log, field, regex_matches.group(i+1))
 
             alb_log_array.append(alb_log)
 

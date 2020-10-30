@@ -28,5 +28,3 @@ class ALBLog:
     request_creation_time = ''
     redirect_url = ''
     new_field = ''
-
-    pass;

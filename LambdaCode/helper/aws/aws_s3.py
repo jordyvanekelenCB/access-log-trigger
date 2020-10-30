@@ -8,41 +8,42 @@ logger.setLevel(logging.INFO)
 
 class AWSS3:
 
-    def __init__(self, aws_event, s3_client):
+    def __init__(self, aws_event, boto_s3_client):
         self.aws_event = aws_event
-        self.s3_client = s3_client
+        self.boto_s3_client = boto_s3_client
 
-    # entry point
-    def getAWSLogFile(self):
-        encoded_gzip_lines = self.retrieve_gzip_lines_from_bucket();
-        decoded_gzip_lines = self.decode_gzip_file(encoded_gzip_lines);
+    def get_aws_log_file(self):
 
-        return decoded_gzip_lines.decode("utf-8")
+        # Retrieve gzip file
+        encoded_gzip_file = self.retrieve_gzip_file_from_bucket();
 
+        # Decode gzip file
+        decoded_gzip_file = self.decode_gzip_file(encoded_gzip_file);
 
-    def retrieve_gzip_lines_from_bucket(self):
+        return decoded_gzip_file.decode("utf-8")
 
-        # retrieve bucket name and file_key from the S3 event
+    def retrieve_gzip_file_from_bucket(self):
+
+        # Retrieve bucket name and file-key from the Lambda event
         bucket_name = self.aws_event['Records'][0]['s3']['bucket']['name']
         file_key = self.aws_event['Records'][0]['s3']['object']['key']
-
         logger.info('Reading {} from {}'.format(file_key, bucket_name))
 
-        # get the object
-        log_obj = self.s3_client.get_object(Bucket=bucket_name, Key=file_key)
+        # Retrieve the ALB log file from the bucket by file-key
+        log_obj = self.boto_s3_client.get_object(Bucket=bucket_name, Key=file_key)
 
         # get encoded gzip file
-        gzip_lines = log_obj['Body'].read()
+        gzip_file = log_obj['Body'].read()
 
-        return gzip_lines
+        return gzip_file
 
     def decode_gzip_file(self, gzip_lines):
 
-        gzip_file = BytesIO(gzip_lines)
+        # Convert gzip file to buffer
+        gzip_file_buffer = BytesIO(gzip_lines)
 
-        gzip_file = gzip.GzipFile(fileobj=gzip_file)
-        decoded_zip = gzip_file.read()
+        # Compress and decode buffer
+        gzip_file_compressed = gzip.GzipFile(fileobj=gzip_file_buffer)
+        gzip_file_decoded = gzip_file_compressed.read()
 
-        return decoded_zip
-
-    pass
+        return gzip_file_decoded
