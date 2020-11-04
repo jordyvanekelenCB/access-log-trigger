@@ -1,15 +1,16 @@
 import logging
-import boto3
-from helper import AWSS3
-from helper import ALBLogParser
+from helper import AWSS3, ALBLogParser, AWSWAFv2
 from http_flood import HTTPFlood
-
-# Setup boto3 session
-session = boto3.Session()
+import configparser
+import os
 
 # Setup logger
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+# Setup config parser
+config = configparser.ConfigParser()
+config.read(os.path.join(os.path.dirname(__file__), 'config', 'config.ini'))
 
 # TODO: write tests, implement clean architecture, think about putting in more than 1 project, what to do with results
 
@@ -18,16 +19,19 @@ Notes:
 
 Een optie is om de interval te verhogen van 5 naar bijv. een uur, het nadeel hiervan is dat een aanval dan pas na een uur gedetecteerd kan worden
 
+https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/wafv2.html?highlight=wafv2#WAFV2.Client.get_ip_set
+
+https://github.com/awslabs/aws-waf-security-automations/blob/d7e42d69c77cead0bb31a41e4a69cf8667884253/source/lib/waflibv2.py#L101
+
+Update IP SET? Get old one, merge with new one? 
+
 """
 
 
 def lambda_handler(event, context):
 
-    # Create boto3 s3 client
-    boto_s3_client = boto3.client('s3')
-
     # Instantiate aws s3 helper
-    aws_s3_helper = AWSS3(event, boto_s3_client)
+    aws_s3_helper = AWSS3(event)
     alb_log_parser_helper = ALBLogParser()
 
     # Retrieve alb log file
@@ -37,14 +41,16 @@ def lambda_handler(event, context):
     alb_log_array = alb_log_parser_helper.parse_alb_log_file(alb_log_file)
 
     # Activate HTTP flood detection
-    http_flood = HTTPFlood(alb_log_array)
+    http_flood = HTTPFlood(config, alb_log_array)
     http_flood_results = http_flood.detect_http_flood()
 
-    print_results(http_flood_results)
+    print_results(config, http_flood_results)
 
 # TODO delete this
-def print_results(http_flood_results):
+def print_results(config, http_flood_results):
 
     for parsed_alb_client in http_flood_results:
 
         logger.info("Finding: " + "Client ip: " + parsed_alb_client.client_ip + ' | Flood level: ' + str(parsed_alb_client.http_flood_level.name) + ' | Number of requests: ' + str(parsed_alb_client.number_of_requests))
+
+    AWSWAFv2(config).retrieve_ip_set();

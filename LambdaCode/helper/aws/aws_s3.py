@@ -1,6 +1,7 @@
 import logging
 from io import BytesIO
 import gzip
+from connection.aws_connection import AWSConnection
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -8,9 +9,9 @@ logger.setLevel(logging.INFO)
 
 class AWSS3:
 
-    def __init__(self, aws_event, boto_s3_client):
+    def __init__(self, aws_event):
         self.aws_event = aws_event
-        self.boto_s3_client = boto_s3_client
+        self.boto_s3_client = AWSConnection().get_connection('s3')
 
     def get_aws_log_file(self):
 
