@@ -54,7 +54,7 @@ def lambda_handler(event, context):
 
 
 # TODO delete this
-def print_results(config, http_flood_results, http_clean_results):
+def print_results(config, http_flood_results, http_clean_results_obj):
 
     logger.info('================================ Http flood detection results ================================')
     for parsed_alb_client in http_flood_results:
@@ -63,10 +63,16 @@ def print_results(config, http_flood_results, http_clean_results):
 
     logger.info('')
 
-    logger.info('================================ Http flood clean results ================================')
-    for item in http_clean_results['Items']:
-        readable_time = datetime.datetime.utcfromtimestamp(item['timestamp_start']).strftime('%Y-%m-%dT%H:%M:%SZ')
-        logger.info("Finding : Removed client ip: " + item['ip'] + " | Flood level: " + item['flood_level'] + " | Time attack detected: " + readable_time)
+    block_list_queue_expired = http_clean_results_obj['block_list_queue_expired']
+    block_list_ip_set_expired = http_clean_results_obj['block_list_ip_set_expired']
 
+    logger.info('================================ Http flood clean results ================================')
+    for ip in block_list_ip_set_expired:
+        # readable_time = datetime.datetime.utcfromtimestamp(item['timestamp_start']).strftime('%Y-%m-%dT%H:%M:%SZ')
+        # logger.info("Finding : Removed client ip: " + item['ip'] + " | Flood level: " + item['flood_level'] + " | Time attack detected: " + readable_time)
+        logger.info("Finding: Removed client ip: " + ip + " from IP Set")
+
+    for ip in block_list_queue_expired:
+        logger.info("Finding: Removed client ip: " + ip + " from queue")
 
 
