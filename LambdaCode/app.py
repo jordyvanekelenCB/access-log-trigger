@@ -3,6 +3,8 @@ from helper import AWSS3, ALBLogParser, AWSWAFv2
 from http_flood import HTTPFlood
 import configparser
 import os
+from http_flood_clean import HTTPFloodClean
+import datetime
 
 # Setup logger
 logger = logging.getLogger()
@@ -44,13 +46,27 @@ def lambda_handler(event, context):
     http_flood = HTTPFlood(config, alb_log_array)
     http_flood_results = http_flood.detect_http_flood()
 
-    print_results(config, http_flood_results)
+    # Activate HTTP flood clean
+    http_clean_results = HTTPFloodClean(config).clean_http_flood()
+
+    print_results(config, http_flood_results, http_clean_results)
+
+
 
 # TODO delete this
-def print_results(config, http_flood_results):
+def print_results(config, http_flood_results, http_clean_results):
 
+    logger.info('================================ Http flood detection results ================================')
     for parsed_alb_client in http_flood_results:
-
         logger.info("Finding: " + "Client ip: " + parsed_alb_client.client_ip + ' | Flood level: ' + str(parsed_alb_client.http_flood_level.name) + ' | Number of requests: ' + str(parsed_alb_client.number_of_requests))
 
-    AWSWAFv2(config).retrieve_ip_set();
+
+    logger.info('')
+
+    logger.info('================================ Http flood clean results ================================')
+    for item in http_clean_results['Items']:
+        readable_time = datetime.datetime.utcfromtimestamp(item['timestamp_start']).strftime('%Y-%m-%dT%H:%M:%SZ')
+        logger.info("Finding : Removed client ip: " + item['ip'] + " | Flood level: " + item['flood_level'] + " | Time attack detected: " + readable_time)
+
+
+

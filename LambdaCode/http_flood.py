@@ -21,13 +21,12 @@ class HTTPFlood:
         self.config = config
 
         # Read config file from relative path
-        self.config.read(os.path.join(os.path.dirname(__file__), 'config', 'config.ini'))
+        #self.config.read(os.path.join(os.path.dirname(__file__), 'config', 'config.ini'))
 
         # Setup instance attributes
         self.http_flood_low_level_threshold = int(self.config[self.config_section_http_flood]['HTTP_FLOOD_LOW_LEVEL_THRESHOLD'])
         self.http_flood_medium_level_threshold = int(self.config[self.config_section_http_flood]['HTTP_FLOOD_MEDIUM_LEVEL_THRESHOLD'])
         self.http_flood_critical_level_threshold = int(self.config[self.config_section_http_flood]['HTTP_FLOOD_CRITICAL_LEVEL_THRESHOLD'])
-
 
     def detect_http_flood(self):
 
@@ -37,9 +36,23 @@ class HTTPFlood:
         # Translate number of requests for each ip to http flood level
         alb_client_array = self.translate_request_dict_to_alb_client_array(ip_and_requests_dict)
 
-        # TODO
+        # Get current block_list
+        ip_set_response = AWSWAFv2(self.config).retrieve_ip_set()
+        current_blocklist_addresses = ip_set_response["IPSet"]["Addresses"]
+        locktoken = ip_set_response["LockToken"]
+
+        # Filter out http_flood_none level to update IP set
+        alb_client_addresses = []
+
+        for alb_client in alb_client_array:
+            if alb_client.http_flood_level.value is not 'flood_level_none':
+                alb_client_addresses.append(alb_client.client_ip + '/32')
+
+        # Merge old block list with new ips
+        new_block_list_addresses = current_blocklist_addresses + alb_client_addresses
+
         # Update IP Set after getting alb client results
-        AWSWAFv2(self.config).update_ip_set(alb_client_array)
+        AWSWAFv2(self.config).update_ip_set(new_block_list_addresses, locktoken)
 
         # Save items to database implementation so IP's can be removed after a certain period of time
         self.insert_alb_findings_in_database(alb_client_array)
@@ -54,7 +67,7 @@ class HTTPFlood:
                 continue
 
             # Save entry in queue
-            DynamoDBConnection().put_block_list_queue_entry(alb_client_item.client_ip, alb_client_item.http_flood_level.value)
+            DynamoDBConnection().insert_block_list_queue_entry(alb_client_item.client_ip, alb_client_item.http_flood_level.value)
 
     def parse_alb_log_to_dict(self, alb_log_array):
 
