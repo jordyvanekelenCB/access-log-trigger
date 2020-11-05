@@ -20,9 +20,6 @@ class HTTPFlood:
         # Setup config parser
         self.config = config
 
-        # Read config file from relative path
-        #self.config.read(os.path.join(os.path.dirname(__file__), 'config', 'config.ini'))
-
         # Setup instance attributes
         self.http_flood_low_level_threshold = int(self.config[self.config_section_http_flood]['HTTP_FLOOD_LOW_LEVEL_THRESHOLD'])
         self.http_flood_medium_level_threshold = int(self.config[self.config_section_http_flood]['HTTP_FLOOD_MEDIUM_LEVEL_THRESHOLD'])
@@ -89,6 +86,7 @@ class HTTPFlood:
 
             number_of_requests = ip_and_requests_dict.get(client_ip)
 
+            # Converts number of requests to HTTP flood level
             if number_of_requests < self.http_flood_low_level_threshold:
                 alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_none))
             elif self.http_flood_low_level_threshold <= number_of_requests < self.http_flood_medium_level_threshold:

@@ -22,8 +22,8 @@ class HTTPFloodClean:
 
     def clean_http_flood(self):
 
-        block_list_queue_to_be_removed = self.retrieve_blocklist_queue()
-        block_list_queue_expired = self.filter_block_list_queue(block_list_queue_to_be_removed)
+        block_list_queue = self.retrieve_blocklist_queue()
+        block_list_queue_expired = self.filter_block_list_queue(block_list_queue)
         self.remove_items_from_block_list(block_list_queue_expired)
 
         return block_list_queue_expired
@@ -31,7 +31,7 @@ class HTTPFloodClean:
     def retrieve_blocklist_queue(self):
 
         # Get block list entries to be removed
-        block_list_queue = DynamoDBConnection().retrieve_block_list_queue(self.http_flood_low_level_timeout)
+        block_list_queue = DynamoDBConnection().retrieve_block_list_queue()
 
         return block_list_queue
 
@@ -56,10 +56,11 @@ class HTTPFloodClean:
                     continue
             elif flood_level == 'flood_level_critical':
 
+                # For debugging purposes
                 now = int(time.time())
-                now_readable = datetime.datetime.utcfromtimestamp(now).strftime('%Y-%m-%dT%H:%M:%SZ')
-
                 attack_detected = timestamp_start + self.http_flood_critical_level_timeout * 60
+
+                now_readable = datetime.datetime.utcfromtimestamp(now).strftime('%Y-%m-%dT%H:%M:%SZ')
                 attack_detected_readable = datetime.datetime.utcfromtimestamp(attack_detected).strftime('%Y-%m-%dT%H:%M:%SZ')
 
                 if int(now) > int(attack_detected):
@@ -101,14 +102,3 @@ class HTTPFloodClean:
 
         # Remove removed items from database queue
         DynamoDBConnection().remove_items_block_list_queue(uuid_list_expired)
-
-
-        # # TODO: Comment out after debugging
-        # logger.info('XXXXXXX')
-        # logger.info(current_blocklist_addresses)
-        #
-        # logger.info('YYYYYYY')
-        # logger.info(ips_to_be_removed)
-        #
-        # logger.info('ZZZZZZZ')
-        # logger.info(new_blocklist)
