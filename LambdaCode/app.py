@@ -3,7 +3,6 @@ from helper import AWSS3, ALBLogParser, AWSWAFv2
 from http_flood import HTTPFlood
 import configparser
 import os
-from http_flood_clean import HTTPFloodClean
 
 # Setup logger
 logger = logging.getLogger()
@@ -29,30 +28,15 @@ def lambda_handler(event, context):
     http_flood = HTTPFlood(config, alb_log_array)
     http_flood_results = http_flood.detect_http_flood()
 
-    # Activate HTTP flood clean
-    http_clean_results = HTTPFloodClean(config).clean_http_flood()
-
-    print_results(config, http_flood_results, http_clean_results)
+    # Print results
+    print_results(http_flood_results)
 
 
-def print_results(config, http_flood_results, http_clean_results_obj):
+def print_results(http_flood_results):
 
     logger.info('================================ Http flood detection results ================================')
 
     for parsed_alb_client in http_flood_results:
         logger.info("Finding: " + "Client ip: " + parsed_alb_client.client_ip + ' | Flood level: ' + str(parsed_alb_client.http_flood_level.name) + ' | Number of requests: ' + str(parsed_alb_client.number_of_requests))
-
-    logger.info('')
-
-    block_list_queue_expired = http_clean_results_obj['block_list_queue_expired']
-    block_list_ip_set_expired = http_clean_results_obj['block_list_ip_set_expired']
-
-    logger.info('================================ Http flood clean results ================================')
-
-    for ip in block_list_ip_set_expired:
-        logger.info("Finding: Removed client ip: " + ip + " from IP Set")
-
-    for ip in block_list_queue_expired:
-        logger.info("Finding: Removed client ip: " + ip + " from queue")
 
 
