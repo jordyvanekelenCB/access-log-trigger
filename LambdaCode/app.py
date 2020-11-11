@@ -1,5 +1,5 @@
 import logging
-from helper import AWSS3, ALBLogParser, AWSWAFv2
+from helper import AWSS3, ALBLogParser
 from http_flood import HTTPFlood
 import configparser
 import os

@@ -16,10 +16,10 @@ class AWSS3:
     def get_aws_log_file(self):
 
         # Retrieve gzip file
-        encoded_gzip_file = self.retrieve_gzip_file_from_bucket();
+        encoded_gzip_file = self.retrieve_gzip_file_from_bucket()
 
         # Decode gzip file
-        decoded_gzip_file = self.decode_gzip_file(encoded_gzip_file);
+        decoded_gzip_file = self.decode_gzip_file(encoded_gzip_file)
 
         return decoded_gzip_file.decode("utf-8")
 

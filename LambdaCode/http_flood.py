@@ -1,6 +1,5 @@
 from enum import Enum
 import logging
-import os
 from models.alb_client import ALBClient
 from helper import AWSWAFv2
 from connection.dynamodb_connection import DynamoDBConnection
@@ -42,7 +41,7 @@ class HTTPFlood:
         alb_client_addresses = []
 
         for alb_client in alb_client_array:
-            if alb_client.http_flood_level.value is not 'flood_level_none':
+            if alb_client.http_flood_level.value != 'flood_level_none':
                 alb_client_addresses.append(alb_client.client_ip + '/32')
 
         # Merge old block list with new ips

@@ -29,7 +29,6 @@ class DynamoDBConnection:
             'timestamp_start': timestamp_cur
         })
 
-
     def retrieve_block_list_queue(self):
         table_block_list_queue = self.dynamodb.Table('block_list_queue')
 
@@ -37,7 +36,6 @@ class DynamoDBConnection:
         block_list_entries = table_block_list_queue.scan()
 
         return block_list_entries
-
 
     def remove_items_block_list_queue(self, uuid_list_expired):
         table_block_list_queue = self.dynamodb.Table('block_list_queue')

@@ -9,6 +9,7 @@ logger.setLevel(logging.INFO)
 class ALBLogParser:
 
     def parse_alb_log_file(self, alb_log_file):
+
         fields = [
             "type",
             "timestamp",
@@ -45,7 +46,7 @@ class ALBLogParser:
         regex = r"([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*)[:-]([0-9]*) ([-.0-9]*) ([-.0-9]*) ([-.0-9]*) (|[-0-9]*) (-|[-0-9]*) ([-0-9]*) ([-0-9]*) \"([^ ]*) ([^ ]*) (- |[^ ]*)\" \"([^\"]*)\" ([A-Z0-9-]+) ([A-Za-z0-9.-]*) ([^ ]*) \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\" ([-.0-9]*) ([^ ]*) \"([^\"]*)\" ($|\"[^ ]*\")(.*)"
 
         # Create list of objects
-        alb_log_array = [];
+        alb_log_array = []
 
         for log_line in alb_log_file.split('\n'):
 
