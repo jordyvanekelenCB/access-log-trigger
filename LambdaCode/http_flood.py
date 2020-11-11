@@ -1,8 +1,8 @@
 from enum import Enum
 import logging
 from models.alb_client import ALBClient
-from helper import AWSWAFv2
-from connection.dynamodb_connection import DynamoDBConnection
+from connection.aws_wafv2_connection import AWSWAFv2
+from connection.aws_dynamodb_connection import DynamoDBConnection
 
 # Setup logger
 logger = logging.getLogger()

@@ -15,7 +15,7 @@ config_path = os.path.join(os.path.dirname(project_root_src + "/LambdaCode"), 'c
 sys.path.insert(0,project_root_src)
 
 # Import project classes
-from LambdaCode.helper.aws.alb_log_parser import ALBLogParser
+from LambdaCode.utilities.aws.alb_log_parser import ALBLogParser
 
 def test_parse_alb_log_file():
 

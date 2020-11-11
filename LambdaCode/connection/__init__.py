@@ -1,2 +1,2 @@
 from .aws_connection import AWSConnection
-from .dynamodb_connection import DynamoDBConnection
+from .aws_dynamodb_connection import DynamoDBConnection

@@ -21,7 +21,7 @@ class AWSS3:
         # Decode gzip file
         decoded_gzip_file = self.decode_gzip_file(encoded_gzip_file)
 
-        return decoded_gzip_file.decode("utf-8")
+        return decoded_gzip_file
 
     def retrieve_gzip_file_from_bucket(self):
 
@@ -45,6 +45,6 @@ class AWSS3:
 
         # Compress and decode buffer
         gzip_file_compressed = gzip.GzipFile(fileobj=gzip_file_buffer)
-        gzip_file_decoded = gzip_file_compressed.read()
+        gzip_file_decoded = gzip_file_compressed.read().decode("utf-8")
 
         return gzip_file_decoded

@@ -1,5 +1,6 @@
 import logging
-from helper import AWSS3, ALBLogParser
+from utilities import ALBLogParser
+from connection.aws_s3_connection import AWSS3
 from http_flood import HTTPFlood
 import configparser
 import os
