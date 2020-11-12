@@ -1,4 +1,8 @@
+""" ALB Log model """
+
+# pylint: disable=R0903
 class ALBLog:
+    """ This class acts as an ALB Log model """
 
     type = ''
     timestmp = ''
