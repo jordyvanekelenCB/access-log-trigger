@@ -1,15 +1,13 @@
+""" This module contains the HTTPFlood class which is reponsible for detecting HTTP flood attacks in log files """
+
 from enum import Enum
-import logging
 from models.alb_client import ALBClient
 from connection.aws_wafv2_connection import AWSWAFv2
 from connection.aws_dynamodb_connection import DynamoDBConnection
 
-# Setup logger
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
 
 class HTTPFlood:
+    """ This class is responsible for finding detecting HTTP flood attacks in log files """
 
     config_section_http_flood = 'HTTP_FLOOD_DETECTION'
 
@@ -20,11 +18,15 @@ class HTTPFlood:
         self.config = config
 
         # Setup instance attributes
-        self.http_flood_low_level_threshold = int(self.config[self.config_section_http_flood]['HTTP_FLOOD_LOW_LEVEL_THRESHOLD'])
-        self.http_flood_medium_level_threshold = int(self.config[self.config_section_http_flood]['HTTP_FLOOD_MEDIUM_LEVEL_THRESHOLD'])
-        self.http_flood_critical_level_threshold = int(self.config[self.config_section_http_flood]['HTTP_FLOOD_CRITICAL_LEVEL_THRESHOLD'])
+        self.http_flood_low_level_threshold = \
+            int(self.config[self.config_section_http_flood]['HTTP_FLOOD_LOW_LEVEL_THRESHOLD'])
+        self.http_flood_medium_level_threshold = \
+            int(self.config[self.config_section_http_flood]['HTTP_FLOOD_MEDIUM_LEVEL_THRESHOLD'])
+        self.http_flood_critical_level_threshold = \
+            int(self.config[self.config_section_http_flood]['HTTP_FLOOD_CRITICAL_LEVEL_THRESHOLD'])
 
     def detect_http_flood(self):
+        """ This is the main function """
 
         # Parse alb log to dictionary with ip:number_of_requests
         ip_and_requests_dict = self.parse_alb_log_to_dict(self.alb_log_array)
@@ -56,6 +58,8 @@ class HTTPFlood:
         return alb_client_array
 
     def insert_alb_findings_in_database(self, alb_client_array):
+        """ Inserts HTTP flood findings into block-list queue"""
+
         for alb_client_item in alb_client_array:
 
             # Skip flood_level_none
@@ -63,9 +67,12 @@ class HTTPFlood:
                 continue
 
             # Save entry in queue
-            DynamoDBConnection().insert_block_list_queue_entry(alb_client_item.client_ip, alb_client_item.http_flood_level.value)
+            DynamoDBConnection().insert_block_list_queue_entry(alb_client_item.client_ip,
+                                                               alb_client_item.http_flood_level.value)
 
-    def parse_alb_log_to_dict(self, alb_log_array):
+    @staticmethod
+    def parse_alb_log_to_dict(alb_log_array):
+        """ Parses a list of ALB Log items into a dictionary with client IP and number of requests """
 
         ip_and_requests_dict = {}
 
@@ -78,6 +85,9 @@ class HTTPFlood:
         return ip_and_requests_dict
 
     def translate_request_dict_to_alb_client_array(self, ip_and_requests_dict):
+        """ Translates dictionary with client IP and number of requests to a list of ALB client objects and converts
+            the number of requests to the according flood level
+         """
 
         alb_client_array = []
 
@@ -90,15 +100,16 @@ class HTTPFlood:
                 alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_none))
             elif self.http_flood_low_level_threshold <= number_of_requests < self.http_flood_medium_level_threshold:
                 alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_low))
-            elif self.http_flood_medium_level_threshold <= number_of_requests < self.http_flood_critical_level_threshold:
+            elif self.http_flood_medium_level_threshold <= number_of_requests < \
+                    self.http_flood_critical_level_threshold:
                 alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_medium))
             elif number_of_requests >= self.http_flood_critical_level_threshold:
                 alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_critical))
 
         return alb_client_array
 
-    # Subclass enum for HTTPFloodLevel
     class HTTPFloodLevel(Enum):
+        """ Subclass enum for HTTPFloodLevel """
         flood_level_none = 'flood_level_none'
         flood_level_low = 'flood_level_low'
         flood_level_medium = 'flood_level_medium'
