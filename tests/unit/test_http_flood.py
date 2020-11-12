@@ -86,9 +86,6 @@ def test_parse_alb_log_to_dict(setup_alb_log_list, setup_config):
     # Assert dictionary has 3 keys
     assert len(ip_and_requests_dict) == 3
 
-    assert True is False
-    exit(1)
-
 
 def test_translate_request_dict_to_alb_client_array(setup_alb_log_list):
     """ Unit test for translate_request_dict_to_alb_client_array class method"""
