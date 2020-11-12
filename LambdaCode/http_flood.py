@@ -53,22 +53,9 @@ class HTTPFlood:
         AWSWAFv2(self.config).update_ip_set(new_block_list_addresses, locktoken)
 
         # Save items to database implementation so IP's can be removed after a certain period of time
-        self.insert_alb_findings_in_database(alb_client_array)
+        DynamoDBConnection().bulk_insert_block_list_queue(alb_client_array)
 
         return alb_client_array
-
-    def insert_alb_findings_in_database(self, alb_client_array):
-        """ Inserts HTTP flood findings into block-list queue"""
-
-        for alb_client_item in alb_client_array:
-
-            # Skip flood_level_none
-            if alb_client_item.http_flood_level == self.HTTPFloodLevel.flood_level_none:
-                continue
-
-            # Save entry in queue
-            DynamoDBConnection().insert_block_list_queue_entry(alb_client_item.client_ip,
-                                                               alb_client_item.http_flood_level.value)
 
     @staticmethod
     def parse_alb_log_to_dict(alb_log_array):
