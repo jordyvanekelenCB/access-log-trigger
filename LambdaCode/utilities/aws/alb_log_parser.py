@@ -1,14 +1,19 @@
-import re, sys
-from models import ALBLog;
-import logging
+""" This module contains the ALBLogParser class which is responsible for converting ALB log lines into a
+list of ALB Log objects"""
 
-# Setup logger
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+import re
+from models import ALBLog
+
 
 class ALBLogParser:
+    """ This class is responsible for converting ALB log lines into a list of ALB Log objects """
 
-    def parse_alb_log_file(self, alb_log_file):
+    def __str__(self):
+        return self.__class__.__name__
+
+    @staticmethod
+    def parse_alb_log_file(alb_log_file):
+        """ Parse an alb log file into a list of ALB Log objects """
 
         fields = [
             "type",
@@ -43,7 +48,10 @@ class ALBLogParser:
         ]
 
         # Regex to parse ALB log file
-        regex = r"([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*)[:-]([0-9]*) ([-.0-9]*) ([-.0-9]*) ([-.0-9]*) (|[-0-9]*) (-|[-0-9]*) ([-0-9]*) ([-0-9]*) \"([^ ]*) ([^ ]*) (- |[^ ]*)\" \"([^\"]*)\" ([A-Z0-9-]+) ([A-Za-z0-9.-]*) ([^ ]*) \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\" ([-.0-9]*) ([^ ]*) \"([^\"]*)\" ($|\"[^ ]*\")(.*)"
+        regex = r"([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*)[:-]([0-9]*) ([-.0-9]*) ([-.0-9]*) ([-.0-9]*) " \
+                r"(|[-0-9]*) (-|[-0-9]*) ([-0-9]*) ([-0-9]*) \"([^ ]*) ([^ ]*) (- |[^ ]*)\" \"([^\"]*)\" ([A-Z0-9-]+)" \
+                r" ([A-Za-z0-9.-]*) ([^ ]*) \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\" ([-.0-9]*) ([^ ]*) \"([^\"]*)\" " \
+                r"($|\"[^ ]*\")(.*)"
 
         # Create list of objects
         alb_log_array = []
@@ -54,7 +62,7 @@ class ALBLogParser:
             regex_matches = re.search(regex, log_line)
 
             if regex_matches:
-                alb_log = ALBLog();
+                alb_log = ALBLog()
 
                 for i, field in enumerate(fields):
 
@@ -64,5 +72,3 @@ class ALBLogParser:
             alb_log_array.append(alb_log)
 
         return alb_log_array
-
-    pass
