@@ -6,3 +6,8 @@ repos:
           args:
             - --max-line-length=125
             - --ignore-imports=yes
+  - repo: https://github.com/aws-cloudformation/cfn-python-lint
+    rev: v0.40.0  # The version of cfn-lint to use
+    hooks:
+      -   id: cfn-python-lint
+          files: path/to/cfn/dir/.*\.(json|yml|yaml)$
