@@ -5,3 +5,4 @@ repos:
       -   id: pylint
           args:
             - --max-line-length=120
+            - --ignore-imports=yes
