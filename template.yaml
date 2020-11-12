@@ -5,7 +5,6 @@ Description: Access log trigger
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
-  eventsx:
   Function:
     Timeout: 3
 
