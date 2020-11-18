@@ -43,9 +43,25 @@ def print_results(http_flood_results):
 
     LOGGER.info('================================ Http flood detection results ================================')
 
+    alb_client_http_flood_none_list = []
+    alb_client_http_flood_low_list = []
+    alb_client_http_flood_medium_list = []
+    alb_client_http_flood_critical_list = []
+
     for parsed_alb_client in http_flood_results:
 
-        # pylint: disable=W1202
-        LOGGER.info("Finding: Client ip: {0} | Flood level: {1} | Number of requests: {2}"
-                    .format(parsed_alb_client.client_ip, parsed_alb_client.http_flood_level.name,
-                            parsed_alb_client.number_of_requests))
+        if parsed_alb_client.http_flood_level.name == 'flood_level_none':
+            alb_client_http_flood_none_list.append(parsed_alb_client)
+        elif parsed_alb_client.http_flood_level.name == 'flood_level_low':
+            alb_client_http_flood_low_list.append(parsed_alb_client)
+        elif parsed_alb_client.http_flood_level.name == 'flood_level_medium':
+            alb_client_http_flood_medium_list.append(parsed_alb_client)
+        elif parsed_alb_client.http_flood_level.name == 'flood_level_critical':
+            alb_client_http_flood_critical_list.append(parsed_alb_client)
+
+    # pylint: disable=W1202
+    LOGGER.info('Total number of clients: {0}'.format(len(http_flood_results)))
+    LOGGER.info('None level flood detections: {0}'.format(len(alb_client_http_flood_none_list)))
+    LOGGER.info('Low level flood detections: {0}'.format(len(alb_client_http_flood_low_list)))
+    LOGGER.info('Medium level flood detections: {0}'.format(len(alb_client_http_flood_medium_list)))
+    LOGGER.info('Critical level flood detections: {0}'.format(len(alb_client_http_flood_critical_list)))
