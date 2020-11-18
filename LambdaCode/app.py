@@ -20,6 +20,9 @@ CONFIG.read(os.path.join(os.path.dirname(__file__), 'config', 'config.ini'))
 def lambda_handler(event, context):
     """ Entry point of the application"""
 
+    # Get application state to determine testing/production
+    application_state = os.environ['APP_STATE']
+
     # Instantiate aws s3 helper
     aws_s3_helper = AWSS3(event)
     alb_log_parser_helper = ALBLogParser()
@@ -27,8 +30,21 @@ def lambda_handler(event, context):
     # Retrieve alb log file
     alb_log_file = aws_s3_helper.get_aws_log_file()
 
+    # Initialize empty log array
+    alb_log_array = []
+
     # Parse alb log file into array of objects
-    alb_log_array = alb_log_parser_helper.parse_alb_log_file_format_webshop(alb_log_file)
+    if application_state == 'production':
+        alb_log_array = alb_log_parser_helper.parse_alb_log_file_format_webshop(alb_log_file)
+    elif application_state == 'test':
+        alb_log_array = alb_log_parser_helper.parse_alb_log_file_format_default(alb_log_file)
+    else:
+        raise Exception('Error: no application state env variable has been set or has other value than "production" '
+                        'or "test". Exiting!')
+
+    # Log application state
+    # pylint: disable=W1202
+    LOGGER.info('Detected application state: {0}'.format(application_state))
 
     # Activate HTTP flood detection
     http_flood = HTTPFlood(CONFIG, alb_log_array)
@@ -60,8 +76,12 @@ def print_results(http_flood_results):
             alb_client_http_flood_critical_list.append(parsed_alb_client)
 
     # pylint: disable=W1202
-    LOGGER.info('Total number of clients: {0}'.format(len(http_flood_results)))
-    LOGGER.info('None level flood detections: {0}'.format(len(alb_client_http_flood_none_list)))
-    LOGGER.info('Low level flood detections: {0}'.format(len(alb_client_http_flood_low_list)))
-    LOGGER.info('Medium level flood detections: {0}'.format(len(alb_client_http_flood_medium_list)))
-    LOGGER.info('Critical level flood detections: {0}'.format(len(alb_client_http_flood_critical_list)))
+    LOGGER.info('Total number of clients: {0}.'.format(len(http_flood_results)))
+
+    LOGGER.info('None level flood detections: {0}.'.format(len(alb_client_http_flood_none_list)))
+    LOGGER.info('Low level flood detections: {0}. Action taken: Added to IP set and queue.'.
+                format(len(alb_client_http_flood_low_list)))
+    LOGGER.info('Medium level flood detections: {0}. Action taken: Added to IP set and queue.'
+                .format(len(alb_client_http_flood_medium_list)))
+    LOGGER.info('Critical level flood detections: {0}. Action taken: Added to IP set and queue.'
+                .format(len(alb_client_http_flood_critical_list)))

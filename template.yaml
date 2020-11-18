@@ -14,3 +14,4 @@ Resources:
       Environment:
         Variables:
           REGION: eu-west-1
+          APP_STATE: 'production'
