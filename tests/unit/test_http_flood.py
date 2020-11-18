@@ -24,7 +24,7 @@ sys.path.insert(0, PROJECT_ROOT_SRC)
 # Import project classes
 # pylint: disable=C0413
 from LambdaCode.http_flood import HTTPFlood
-from LambdaCode.models.alb_log import ALBLog
+from LambdaCode.models.alb_log_default import ALBLog
 
 
 @pytest.fixture()

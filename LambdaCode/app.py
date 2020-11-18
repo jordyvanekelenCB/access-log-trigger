@@ -28,7 +28,7 @@ def lambda_handler(event, context):
     alb_log_file = aws_s3_helper.get_aws_log_file()
 
     # Parse alb log file into array of objects
-    alb_log_array = alb_log_parser_helper.parse_alb_log_file(alb_log_file)
+    alb_log_array = alb_log_parser_helper.parse_alb_log_file_format_webshop(alb_log_file)
 
     # Activate HTTP flood detection
     http_flood = HTTPFlood(CONFIG, alb_log_array)

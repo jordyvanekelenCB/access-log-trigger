@@ -40,20 +40,22 @@ class HTTPFlood:
         locktoken = ip_set_response["LockToken"]
 
         # Filter out http_flood_none level to update IP set
-        alb_client_addresses = []
+        wafv2_alb_client_addresses = []
+        db_alb_client_list = []
 
         for alb_client in alb_client_array:
             if alb_client.http_flood_level.value != 'flood_level_none':
-                alb_client_addresses.append(alb_client.client_ip + '/32')
+                wafv2_alb_client_addresses.append(alb_client.client_ip + '/32')
+                db_alb_client_list.append(alb_client)
 
         # Merge old block list with new ips
-        new_block_list_addresses = current_blocklist_addresses + alb_client_addresses
+        new_block_list_addresses = current_blocklist_addresses + wafv2_alb_client_addresses
 
         # Update IP Set after getting alb client results
         AWSWAFv2(self.config).update_ip_set(new_block_list_addresses, locktoken)
 
         # Save items to database implementation so IP's can be removed after a certain period of time
-        DynamoDBConnection().bulk_insert_block_list_queue(alb_client_array)
+        DynamoDBConnection().bulk_insert_block_list_queue(db_alb_client_list)
 
         return alb_client_array
 
