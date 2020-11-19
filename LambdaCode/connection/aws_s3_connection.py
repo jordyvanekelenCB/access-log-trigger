@@ -17,7 +17,7 @@ class AWSS3:
         self.aws_event = aws_event
         self.boto_s3_client = AWSConnection().get_connection('s3')
 
-    def get_aws_log_file(self):
+    def get_aws_log_file(self) -> str:
         """ Main function """
 
         # Retrieve gzip file
@@ -28,7 +28,7 @@ class AWSS3:
 
         return decoded_gzip_file
 
-    def retrieve_gzip_file_from_bucket(self):
+    def retrieve_gzip_file_from_bucket(self) -> str:
         """ Retrieves encoded gzip file from bucket """
 
         # Retrieve bucket name and file-key from the Lambda event
@@ -47,7 +47,7 @@ class AWSS3:
         return gzip_file
 
     @staticmethod
-    def decode_gzip_file(gzip_lines):
+    def decode_gzip_file(gzip_lines) -> str:
         """ Decodes the gzip file """
 
         # Convert gzip file to buffer

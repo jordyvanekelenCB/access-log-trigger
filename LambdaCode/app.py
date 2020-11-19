@@ -16,8 +16,9 @@ LOGGER.setLevel(logging.INFO)
 CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), 'config', 'config.ini'))
 
+
 # pylint: disable=W0613
-def lambda_handler(event, context):
+def lambda_handler(event, context) -> None:
     """ Entry point of the application"""
 
     # Get application state to determine testing/production
@@ -54,7 +55,7 @@ def lambda_handler(event, context):
     print_results(http_flood_results)
 
 
-def print_results(http_flood_results):
+def print_results(http_flood_results) -> None:
     """ Prints the results of the http flood detection module """
 
     LOGGER.info('================================ Http flood detection results ================================')

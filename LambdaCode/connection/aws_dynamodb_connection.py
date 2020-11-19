@@ -12,7 +12,7 @@ class DynamoDBConnection(IQueueDatabase):
     def __init__(self):
         self.dynamodb = boto3.resource('dynamodb')
 
-    def insert_into_queue(self, client_list):
+    def insert_into_queue(self, client_list) -> None:
         """ Inserts bulk data into list queue table """
 
         put_item_request_list = []
@@ -45,7 +45,7 @@ class DynamoDBConnection(IQueueDatabase):
                 'block_list_queue': put_item_request_chunk
             })
 
-    def get_from_queue(self):
+    def get_from_queue(self) -> list:
         """ Retrieves all entries from the block-list queue """
 
         table_block_list_queue = self.dynamodb.Table('block_list_queue')
@@ -55,7 +55,7 @@ class DynamoDBConnection(IQueueDatabase):
 
         return block_list_entries
 
-    def remove_from_queue(self, client_list):
+    def remove_from_queue(self, client_list) -> None:
         """ Removes an item from the block-list queue by a given list of uuid's """
 
         # Change name from abstract implementation
