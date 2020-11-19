@@ -61,7 +61,7 @@ class HTTPFlood:
         return alb_client_array
 
     @staticmethod
-    def parse_alb_log_to_dict(alb_log_array):
+    def parse_alb_log_to_dict(alb_log_array) -> dict:
         """ Parses a list of ALB Log items into a dictionary with client IP and number of requests """
 
         ip_and_requests_dict = {}
@@ -74,12 +74,12 @@ class HTTPFlood:
 
         return ip_and_requests_dict
 
-    def translate_request_dict_to_alb_client_array(self, ip_and_requests_dict):
+    def translate_request_dict_to_alb_client_array(self, ip_and_requests_dict) -> list:
         """ Translates dictionary with client IP and number of requests to a list of ALB client objects and converts
             the number of requests to the according flood level
          """
 
-        alb_client_array = []
+        alb_client_list = []
 
         for client_ip in ip_and_requests_dict:
 
@@ -87,16 +87,16 @@ class HTTPFlood:
 
             # Converts number of requests to HTTP flood level
             if number_of_requests < self.http_flood_low_level_threshold:
-                alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_none))
+                alb_client_list.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_none))
             elif self.http_flood_low_level_threshold <= number_of_requests < self.http_flood_medium_level_threshold:
-                alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_low))
+                alb_client_list.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_low))
             elif self.http_flood_medium_level_threshold <= number_of_requests < \
                     self.http_flood_critical_level_threshold:
-                alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_medium))
+                alb_client_list.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_medium))
             elif number_of_requests >= self.http_flood_critical_level_threshold:
-                alb_client_array.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_critical))
+                alb_client_list.append(ALBClient(client_ip, number_of_requests, self.HTTPFloodLevel.flood_level_critical))
 
-        return alb_client_array
+        return alb_client_list
 
     class HTTPFloodLevel(Enum):
         """ Subclass enum for HTTPFloodLevel """

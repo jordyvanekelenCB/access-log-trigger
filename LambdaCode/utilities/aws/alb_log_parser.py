@@ -12,7 +12,7 @@ class ALBLogParser:
         return self.__class__.__name__
 
     @staticmethod
-    def parse_alb_log_file_format_default(alb_log_file):
+    def parse_alb_log_file_format_default(alb_log_file) -> list:
         """ Parse an alb log file into a list of ALB Log objects. Format: default """
 
         fields = [
@@ -78,7 +78,7 @@ class ALBLogParser:
         """ Parse an alb log file into a list of ALB Log objects. Format: webshop """
 
         # Create list of objects
-        alb_log_array = []
+        alb_log_list = []
 
         # Split log file into list of lines
         alb_log_file_list = alb_log_file.split('\n')
@@ -105,6 +105,6 @@ class ALBLogParser:
                                                    alb_log_line_list[27], alb_log_line_list[28], alb_log_line_list[29],
                                                    alb_log_line_list[30], alb_log_line_list[31], alb_log_line_list[32])
 
-            alb_log_array.append(alb_log_webshop_object)
+            alb_log_list.append(alb_log_webshop_object)
 
-        return alb_log_array
+        return alb_log_list
