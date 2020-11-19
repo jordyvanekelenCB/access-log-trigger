@@ -1,4 +1,4 @@
-""" This module holds the PrintResults class """
+""" This module holds the Diagnostics class """
 
 import logging
 
