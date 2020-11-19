@@ -41,20 +41,19 @@ class Diagnostics:
         # pylint: disable=W1202
         LOGGER.info('Total number of clients: {0}.'.format(len(http_flood_results)))
 
-        if not alb_client_http_flood_low_list:
+        if alb_client_http_flood_low_list:
             LOGGER.info('Low level flood detections: {0}. Action taken: Added to IP set and queue.'.
                         format(len(alb_client_http_flood_low_list)))
         else:
             LOGGER.info('Low level flood detections: 0.')
 
-        if not alb_client_http_flood_medium_list:
+        if alb_client_http_flood_medium_list:
             LOGGER.info('Medium level flood detections: {0}. Action taken: Added to IP set and queue.'.
                         format(len(alb_client_http_flood_medium_list)))
         else:
             LOGGER.info('Medium level flood detections: 0.')
 
-
-        if not alb_client_http_flood_critical_list:
+        if alb_client_http_flood_critical_list:
             LOGGER.info('Critical level flood detections: {0}. Action taken: Added to IP set and queue.'.
                         format(len(alb_client_http_flood_critical_list)))
         else:
@@ -64,7 +63,7 @@ class Diagnostics:
 
         LOGGER.info('Low level flood detections [{0}]: '.format(len(alb_client_http_flood_low_list)))
 
-        if not alb_client_http_flood_low_list:
+        if alb_client_http_flood_low_list:
             for alb_client in alb_client_http_flood_low_list:
                 LOGGER.info('\t - Client IP: {0}. Number of requests: {1}'
                             .format(alb_client.client_ip, alb_client.number_of_requests))
@@ -73,7 +72,7 @@ class Diagnostics:
 
         LOGGER.info('Medium level flood detections [{0}]: '.format(len(alb_client_http_flood_medium_list)))
 
-        if not alb_client_http_flood_medium_list:
+        if alb_client_http_flood_medium_list:
             for alb_client in alb_client_http_flood_medium_list:
                 LOGGER.info('Client IP: {0}. Number of requests: {1}'
                             .format(alb_client.client_ip, alb_client.number_of_requests))
@@ -82,7 +81,7 @@ class Diagnostics:
 
         LOGGER.info('Critical level flood detections [{0}]: '.format(len(alb_client_http_flood_critical_list)))
 
-        if not alb_client_http_flood_critical_list:
+        if alb_client_http_flood_critical_list:
             for alb_client in alb_client_http_flood_critical_list:
                 LOGGER.info('Client IP: {0}. Number of requests: {1}'
                             .format(alb_client.client_ip, alb_client.number_of_requests))
