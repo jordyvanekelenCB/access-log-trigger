@@ -3,20 +3,21 @@
 import time
 # pylint: disable=E0401
 import boto3
+from interfaces.iqueuedatabase import IQueueDatabase
 
 
-class DynamoDBConnection:
-    """ Handles all connections to DynamoDB """
+class DynamoDBConnection(IQueueDatabase):
+    """ Handles all connections to DynamoDB, implements interface IQueueDatabase """
 
     def __init__(self):
         self.dynamodb = boto3.resource('dynamodb')
 
-    def bulk_insert_block_list_queue(self, alb_client_list):
+    def insert_into_queue(self, client_list):
         """ Inserts bulk data into list queue table """
 
         put_item_request_list = []
 
-        for alb_client in alb_client_list:
+        for alb_client in client_list:
 
             # Generate current timestamp
             timestamp_cur = int(time.time())
@@ -44,26 +45,7 @@ class DynamoDBConnection:
                 'block_list_queue': put_item_request_chunk
             })
 
-    def insert_block_list_queue_entry(self, ip_address, flood_level):
-        """ Inserts entry in block-list queue """
-
-        table_block_list_queue = self.dynamodb.Table('block_list_queue')
-
-        # Generate current timestamp
-        timestamp_cur = int(time.time())
-
-        # Generate uuid to conform to primary key restrictions
-        uuid = ip_address + '_' + str(timestamp_cur) + '_' + flood_level
-
-        # Insert item and get response
-        table_block_list_queue.put_item(Item={
-            'uuid': uuid,
-            'ip': ip_address,
-            'flood_level': flood_level,
-            'timestamp_start': timestamp_cur
-        })
-
-    def retrieve_block_list_queue(self):
+    def get_from_queue(self):
         """ Retrieves all entries from the block-list queue """
 
         table_block_list_queue = self.dynamodb.Table('block_list_queue')
@@ -73,8 +55,11 @@ class DynamoDBConnection:
 
         return block_list_entries
 
-    def remove_items_block_list_queue(self, uuid_list_expired):
+    def remove_from_queue(self, client_list):
         """ Removes an item from the block-list queue by a given list of uuid's """
+
+        # Change name from abstract implementation
+        uuid_list_expired = client_list
 
         table_block_list_queue = self.dynamodb.Table('block_list_queue')
 

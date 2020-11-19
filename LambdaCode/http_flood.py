@@ -26,6 +26,7 @@ class HTTPFlood:
             int(self.config[self.config_section_http_flood]['HTTP_FLOOD_CRITICAL_LEVEL_THRESHOLD'])
 
     def detect_http_flood(self) -> list:
+
         """ This is the main function """
 
         # Parse alb log to dictionary with ip:number_of_requests
@@ -55,7 +56,7 @@ class HTTPFlood:
         AWSWAFv2(self.config).update_ip_set(new_block_list_addresses, locktoken)
 
         # Save items to database implementation so IP's can be removed after a certain period of time
-        DynamoDBConnection().bulk_insert_block_list_queue(db_alb_client_list)
+        DynamoDBConnection().insert_into_queue(db_alb_client_list)
 
         return alb_client_array
 
