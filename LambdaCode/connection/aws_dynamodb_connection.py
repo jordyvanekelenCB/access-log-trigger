@@ -46,24 +46,7 @@ class DynamoDBConnection(IQueueDatabase):
             })
 
     def get_from_queue(self) -> list:
-        """ Retrieves all entries from the block-list queue """
+        pass
 
-        table_block_list_queue = self.dynamodb.Table('block_list_queue')
-
-        # Return all entries from database
-        block_list_entries = table_block_list_queue.scan()
-
-        return block_list_entries
-
-    def remove_from_queue(self, client_list) -> None:
-        """ Removes an item from the block-list queue by a given list of uuid's """
-
-        # Change name from abstract implementation
-        uuid_list_expired = client_list
-
-        table_block_list_queue = self.dynamodb.Table('block_list_queue')
-
-        for uuid in uuid_list_expired:
-            table_block_list_queue.delete_item(Key={
-                'uuid': uuid
-            })
+    def remove_from_queue(self, client_list):
+        pass
