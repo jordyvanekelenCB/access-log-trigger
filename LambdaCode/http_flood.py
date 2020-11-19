@@ -25,7 +25,7 @@ class HTTPFlood:
         self.http_flood_critical_level_threshold = \
             int(self.config[self.config_section_http_flood]['HTTP_FLOOD_CRITICAL_LEVEL_THRESHOLD'])
 
-    def detect_http_flood(self):
+    def detect_http_flood(self) -> list:
         """ This is the main function """
 
         # Parse alb log to dictionary with ip:number_of_requests
