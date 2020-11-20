@@ -9,11 +9,18 @@ from interfaces.iqueuedatabase import IQueueDatabase
 class DynamoDBConnection(IQueueDatabase):
     """ Handles all connections to DynamoDB, implements interface IQueueDatabase """
 
-    def __init__(self):
+    config_section_dynamoDB = 'DYNAMO_DB'
+
+    def __init__(self, config):
         self.dynamodb = boto3.resource('dynamodb')
+
+        # Get Dynamo DB table name
+        self.dynamodb_block_list_table_name = config[self.config_section_dynamoDB]['BLOCK_LIST_QUEUE_TABLE']
 
     def insert_into_queue(self, client_list) -> None:
         """ Inserts bulk data into list queue table """
+
+
 
         put_item_request_list = []
 
@@ -42,11 +49,39 @@ class DynamoDBConnection(IQueueDatabase):
 
         for put_item_request_chunk in put_item_request_chunks_list:
             self.dynamodb.batch_write_item(RequestItems={
-                'block_list_queue': put_item_request_chunk
+                self.dynamodb_block_list_table_name: put_item_request_chunk
             })
 
     def get_from_queue(self) -> list:
-        pass
+        """ Retrieves all entries from the block-list queue """
 
-    def remove_from_queue(self, client_list):
-        pass
+        table_block_list_queue = self.dynamodb.Table(self.dynamodb_block_list_table_name)
+
+        # Return all entries from database
+        block_list_entries = table_block_list_queue.scan()
+
+        return block_list_entries
+
+    def remove_from_queue(self, client_list) -> None:
+        """ Removes an item from the block-list queue by a given list of uuid's """
+
+        uuid_list_expired = client_list  # Rename from implementation
+        uuid_list_expired_commands = []
+
+        for uuid in uuid_list_expired:
+            uuid_list_expired_commands.append({
+                'DeleteRequest': {
+                    'Key': {
+                        'uuid': uuid
+                    }
+                }
+            })
+
+        # Divide put_item_request_list into chunks of smaller list because bulk_insert limit is 25 per request:
+        uuid_list_expired_chunks = [uuid_list_expired_commands[x:x+25]
+                                    for x in range(0, len(uuid_list_expired_commands), 25)]
+
+        for uuid_list_expired_chunk in uuid_list_expired_chunks:
+            self.dynamodb.batch_write_item(RequestItems={
+                self.dynamodb_block_list_table_name: uuid_list_expired_chunk
+            })

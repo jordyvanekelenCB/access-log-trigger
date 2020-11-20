@@ -56,7 +56,7 @@ class HTTPFlood:
         AWSWAFv2(self.config).update_ip_set(new_block_list_addresses, locktoken)
 
         # Save items to database implementation so IP's can be removed after a certain period of time
-        DynamoDBConnection().insert_into_queue(db_alb_client_list)
+        DynamoDBConnection(self.config).insert_into_queue(db_alb_client_list)
 
         return alb_client_array
 

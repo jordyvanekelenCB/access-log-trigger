@@ -64,6 +64,7 @@ def setup_config():
 
     return config
 
+
 # pylint: disable=W0621
 def test_parse_alb_log_to_dict(setup_alb_log_list, setup_config):
     """ Unit test for parse_alb_log_to_dict class method"""
