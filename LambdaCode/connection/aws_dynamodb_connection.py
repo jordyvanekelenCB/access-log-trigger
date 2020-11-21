@@ -20,8 +20,6 @@ class DynamoDBConnection(IQueueDatabase):
     def insert_into_queue(self, client_list) -> None:
         """ Inserts bulk data into list queue table """
 
-
-
         put_item_request_list = []
 
         for alb_client in client_list:
